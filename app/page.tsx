@@ -13,7 +13,7 @@ export default function Home() {
       <Sidebar />
       <div className="relative flex flex-1 flex-col overflow-hidden">
         <ChatArea hasStarted={hasStarted} />
-        <InputArea onStart={() => setHasStarted(true)} />
+          <InputArea onStart={() => setHasStarted(true)} />
       </div>
     </div>
   )
