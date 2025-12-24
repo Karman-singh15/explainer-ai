@@ -1,19 +1,38 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 interface InputAreaProps {
     onStart: () => void;
+    started: boolean;
 }
 
-export default function InputArea({ onStart }: InputAreaProps) {
+export default function InputArea({ onStart, started }: InputAreaProps) {
     const [input, setInput] = useState("");
+    const router = useRouter();
+    
+    async function addChat() {
+        const res = await fetch("/api/chats", {
+            method: "POST",
+        });
+    
+        const data = await res.json();
+        console.log(data)
+        console.log(res)
+    
+        const chatId = data.chatId;
+    
+        router.push(`/chat/${chatId}`);
+    }
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
         if (e.key === "Enter" && !e.shiftKey) {
             e.preventDefault();
             onStart();
-            console.log("Sending:", input);
+            if (!started) {
+                addChat();
+            }
             setInput("");
         }
     };

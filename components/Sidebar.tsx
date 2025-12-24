@@ -1,9 +1,21 @@
-import Link from "next/link";
+"use client";
+import { useRouter } from "next/navigation";
 
 export default function Sidebar() {
-    const addChat = () => {
-        
-    }
+    const router = useRouter();
+
+  async function addChat() {
+    const res = await fetch("/api/chats", {
+      method: "POST",
+    });
+
+    const data = await res.json();
+
+    const chatId = data.chatId;
+
+    router.push(`/chat/${chatId}`);
+  }
+
     return (
         <aside className="fixed inset-y-0 left-0 z-50 w-64 -translate-x-full transform bg-zinc-900 p-4 transition-transform duration-300 md:relative md:translate-x-0">
             <div className="flex h-full flex-col">

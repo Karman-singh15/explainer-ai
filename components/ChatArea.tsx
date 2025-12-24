@@ -1,7 +1,9 @@
+"use client";
 import Message from "./Message";
 
 interface ChatAreaProps {
     hasStarted: boolean;
+    chatId: string;
 }
 
 export default function ChatArea({ hasStarted }: ChatAreaProps) {

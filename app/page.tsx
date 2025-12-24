@@ -12,8 +12,8 @@ export default function Home() {
     <div className="flex h-screen overflow-hidden bg-[#343541]">
       <Sidebar />
       <div className="relative flex flex-1 flex-col overflow-hidden">
-        <ChatArea hasStarted={hasStarted} />
-          <InputArea onStart={() => setHasStarted(true)} />
+        <ChatArea hasStarted={hasStarted} chatId={""} />
+          <InputArea onStart={() => setHasStarted(true)} started={false} />
       </div>
     </div>
   )
