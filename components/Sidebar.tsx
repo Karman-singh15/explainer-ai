@@ -1,7 +1,12 @@
 "use client";
 import { useRouter } from "next/navigation";
+import { useUser } from "@clerk/nextjs";
+
 
 export default function Sidebar() {
+     const { user, isLoaded } = useUser();
+
+  if (!isLoaded) return null;
     const router = useRouter();
 
   async function addChat() {
@@ -49,7 +54,7 @@ export default function Sidebar() {
                 <div className="mt-auto border-t border-zinc-700 pt-3">
                     <button className="flex w-full items-center gap-3 rounded-md px-3 py-3 text-sm hover:bg-zinc-800 transition-colors text-white">
                         <div className="h-8 w-8 rounded-sm bg-green-500 flex items-center justify-center font-bold">U</div>
-                        <div className="font-medium">User</div>
+                        <div className="font-medium">{user?.firstName}</div>
                     </button>
                 </div>
             </div>

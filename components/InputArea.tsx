@@ -18,8 +18,6 @@ export default function InputArea({ onStart, started }: InputAreaProps) {
         });
     
         const data = await res.json();
-        console.log(data)
-        console.log(res)
     
         const chatId = data.chatId;
     
