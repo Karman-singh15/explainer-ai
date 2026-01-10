@@ -3,8 +3,9 @@ import { useRouter } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
 import { SignOutButton } from "@clerk/nextjs";
 import { useEffect, useState } from "react";
-import Link from "next/link"; // Import Link
-import { Pencil, Check, X } from "lucide-react"; // Start using Lucide icons for better UI
+import Link from "next/link";
+import Image from "next/image";
+import { Pencil, Check, X, Trash } from "lucide-react";
 
 interface Chat {
     chatId: string;
@@ -90,9 +91,40 @@ export default function Sidebar() {
         }
     };
 
+    const deleteChat = async (chatId: string) => {
+        try {
+            const res = await fetch(`/api/chats/${chatId}`, {
+                method: "DELETE",
+            });
+
+            if (res.ok) {
+                setChats((prev) => prev.filter((c) => c.chatId !== chatId));
+                // If the deleted chat was active, navigate to home (optional but good UX)
+                if (window.location.pathname === `/chat/${chatId}`) {
+                    router.push("/");
+                }
+            }
+        } catch (error) {
+            console.error("Failed to delete chat", error);
+        }
+    };
+
     return (
         <aside className="fixed inset-y-0 left-0 z-50 w-64 -translate-x-full transform bg-zinc-900 p-4 transition-transform duration-300 md:relative md:translate-x-0">
             <div className="flex h-full flex-col">
+                {/* Home / Logo Button */}
+                <Link href="/" className="mb-6 flex items-center gap-2 px-2 hover:bg-zinc-800 rounded-md py-2 transition-colors">
+                    <div className="relative h-8 w-8 shrink-0">
+                        <Image
+                            src="/logo.png"
+                            alt="Explainer AI"
+                            fill
+                            className="object-contain"
+                        />
+                    </div>
+                    <span className="text-lg font-semibold text-white">Explainer AI</span>
+                </Link>
+
                 {/* New Chat Button */}
                 <button
                     className="mb-4 flex items-center justify-start gap-3 rounded-md border border-zinc-700 px-3 py-3 text-sm text-white hover:bg-zinc-800 transition-colors"
@@ -164,15 +196,28 @@ export default function Sidebar() {
                                     >
                                         {chat.name}
                                     </Link>
-                                    <button
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            startEditing(chat);
-                                        }}
-                                        className="opacity-0 group-hover:opacity-100 text-zinc-500 hover:text-white transition-opacity"
-                                    >
-                                        <Pencil size={14} />
-                                    </button>
+                                    <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <button
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                startEditing(chat);
+                                            }}
+                                            className="text-zinc-500 hover:text-white transition-colors p-1"
+                                            title="Rename"
+                                        >
+                                            <Pencil size={14} />
+                                        </button>
+                                        <button
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                deleteChat(chat.chatId);
+                                            }}
+                                            className="text-zinc-500 hover:text-red-500 transition-colors p-1"
+                                            title="Delete"
+                                        >
+                                            <Trash size={14} />
+                                        </button>
+                                    </div>
                                 </>
                             )}
                         </div>
@@ -189,7 +234,7 @@ export default function Sidebar() {
                     </button>
                     <SignOutButton>
                         <button className="flex w-1/5 items-center gap-3 rounded-md px-3 py-3 text-sm hover:bg-zinc-800 transition-colors text-white">
-                            <img src="/logout.png" alt="signout" />
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-log-out-icon lucide-log-out"><path d="m16 17 5-5-5-5" /><path d="M21 12H9" /><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" /></svg>
                         </button>
                     </SignOutButton>
                 </div>
