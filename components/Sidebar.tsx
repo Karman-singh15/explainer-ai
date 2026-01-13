@@ -1,3 +1,4 @@
+
 "use client";
 import { useRouter } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
@@ -5,7 +6,7 @@ import { SignOutButton } from "@clerk/nextjs";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Pencil, Check, X, Trash } from "lucide-react";
+import { Pencil, Check, X, Trash, Sparkles, BadgeCheck, Settings, Bell, LogOut, ChevronsUpDown } from "lucide-react";
 
 interface Chat {
     chatId: string;
@@ -18,6 +19,7 @@ export default function Sidebar() {
     const [chats, setChats] = useState<Chat[]>([]);
     const [editingChatId, setEditingChatId] = useState<string | null>(null);
     const [newChatName, setNewChatName] = useState("");
+    const [isProfileOpen, setIsProfileOpen] = useState(false); // New state for popover
 
     // Sync user and fetch chats
     useEffect(() => {
@@ -225,20 +227,91 @@ export default function Sidebar() {
                 </div>
 
                 {/* User Profile / Settings (Bottom) */}
-                <div className="mt-auto border-t border-zinc-700 pt-3 flex">
-                    <button className="flex w-4/5 items-center gap-3 rounded-md px-3 py-3 text-sm hover:bg-zinc-800 transition-colors text-white">
-                        <div className="h-8 w-8 rounded-sm bg-green-500 flex items-center justify-center font-bold">
-                            {user?.firstName?.charAt(0) || "U"}
+                <div className="m-auto border-t border-zinc-800 pt-2 relative">
+                    {isProfileOpen && (
+                        <>
+                            {/* Backdrop to close menu when clicking outside */}
+                            <div
+                                className="fixed inset-0 z-40"
+                                onClick={() => setIsProfileOpen(false)}
+                            />
+
+                            {/* Popover Menu */}
+                            <div className="absolute bottom-full left-0 mb-2 w-full min-w-[240px] rounded-lg border border-zinc-800 bg-zinc-950 p-1 shadow-xl z-50">
+                                <div className="p-2 flex items-center gap-3 border-b border-zinc-800 pb-2 mb-1">
+                                    <div className="h-8 w-8 rounded-sm overflow-hidden bg-zinc-800 shrink-0">
+                                        <Image
+                                            src={user?.imageUrl || "/logo.png"}
+                                            alt={user?.firstName || "User"}
+                                            width={32}
+                                            height={32}
+                                            className="h-full w-full object-cover"
+                                        />
+                                    </div>
+                                    <div className="flex-1 overflow-hidden">
+                                        <p className="text-sm font-medium text-white truncate">{user?.firstName} {user?.lastName}</p>
+                                        <p className="text-xs text-zinc-400 truncate">{user?.emailAddresses[0]?.emailAddress}</p>
+                                    </div>
+                                </div>
+
+                                <div className="px-1 py-1">
+                                    <button className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm text-white hover:bg-zinc-800 transition-colors">
+                                        <Sparkles size={16} className="text-blue-400" />
+                                        <span>Upgrade to Pro</span>
+                                    </button>
+                                </div>
+
+                                <div className="my-1 border-t border-zinc-800" />
+
+                                <div className="px-1 py-1 space-y-0.5">
+                                    <button className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm text-zinc-200 hover:bg-zinc-800 transition-colors">
+                                        <BadgeCheck size={16} />
+                                        <span>Account</span>
+                                    </button>
+                                    <button className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm text-zinc-200 hover:bg-zinc-800 transition-colors">
+                                        <Settings size={16} />
+                                        <span>Settings</span>
+                                    </button>
+                                    <button className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm text-zinc-200 hover:bg-zinc-800 transition-colors">
+                                        <Bell size={16} />
+                                        <span>Notifications</span>
+                                    </button>
+                                </div>
+
+                                <div className="my-1 border-t border-zinc-800" />
+
+                                <SignOutButton>
+                                    <button className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm text-zinc-200 hover:bg-zinc-800 transition-colors">
+                                        <LogOut size={16} />
+                                        <span>Log out</span>
+                                    </button>
+                                </SignOutButton>
+                            </div>
+                        </>
+                    )}
+
+                    <button
+                        onClick={() => setIsProfileOpen(!isProfileOpen)}
+                        className="flex w-full items-center gap-3 rounded-md px-2 py-2 text-sm hover:bg-zinc-800 transition-colors text-white group"
+                    >
+                        <div className="h-8 w-8 rounded-sm overflow-hidden bg-zinc-700 shrink-0">
+                            <Image
+                                src={user?.imageUrl || "/logo.png"}
+                                alt={user?.firstName || "User"}
+                                width={32}
+                                height={32}
+                                className="h-full w-full object-cover"
+                            />
                         </div>
-                        <div className="font-medium">{user?.firstName}</div>
+                        <div className="flex-1 text-left overflow-hidden">
+                            <p className="font-medium truncate text-sm">{user?.firstName}</p>
+                            <p className="text-xs text-zinc-500 truncate">{user?.emailAddresses[0]?.emailAddress}</p>
+                        </div>
+                        <ChevronsUpDown size={16} className="text-zinc-500 group-hover:text-zinc-300" />
                     </button>
-                    <SignOutButton>
-                        <button className="flex w-1/5 items-center gap-3 rounded-md px-3 py-3 text-sm hover:bg-zinc-800 transition-colors text-white">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-log-out-icon lucide-log-out"><path d="m16 17 5-5-5-5" /><path d="M21 12H9" /><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" /></svg>
-                        </button>
-                    </SignOutButton>
                 </div>
             </div>
         </aside>
     );
 }
+

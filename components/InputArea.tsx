@@ -25,12 +25,13 @@ export default function InputArea({ onStart, started }: InputAreaProps) {
     }
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-        if (e.key === "Enter" && !e.shiftKey) {
+        if (e.key === "Enter" && !e.shiftKey && input) {
             e.preventDefault();
             onStart();
             if (!started) {
                 addChat();
             }
+            console.log("Sending:", input);
             setInput("");
         }
     };
@@ -82,9 +83,14 @@ export default function InputArea({ onStart, started }: InputAreaProps) {
                         {/* Send Button (White Circle) */}
                         <button
                             onClick={() => {
-                                onStart();
-                                console.log("Sending:", input);
-                                setInput("");
+                                if (input){
+                                    onStart();
+                                    if (!started) {
+                                        addChat();
+                                    }
+                                    console.log("Sending:", input);
+                                    setInput("");
+                                }
                             }}
                             className="flex h-10 w-10 items-center justify-center rounded-full bg-white text-black transition-transform hover:scale-105 active:scale-95 disabled:opacity-50"
                         >
