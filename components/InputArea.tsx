@@ -3,36 +3,47 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
+
 interface InputAreaProps {
     onStart: () => void;
     started: boolean;
+    onSendMessage: (text: string) => void;
 }
 
-export default function InputArea({ onStart, started }: InputAreaProps) {
+export default function InputArea({ onStart, started, onSendMessage }: InputAreaProps) {
     const [input, setInput] = useState("");
     const router = useRouter();
-    
+
     async function addChat() {
         const res = await fetch("/api/chats", {
             method: "POST",
         });
-    
+
         const data = await res.json();
-    
+
         const chatId = data.chatId;
-    
         router.push(`/chat/${chatId}`);
+        return chatId;
     }
 
-    const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    const handleKeyDown = async (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
         if (e.key === "Enter" && !e.shiftKey && input) {
             e.preventDefault();
-            onStart();
-            if (!started) {
-                addChat();
-            }
-            console.log("Sending:", input);
+            const text = input;
             setInput("");
+
+            if (!started) {
+                const chatId = await addChat();
+                // We might need to handle sending the message after navigation or 
+                // let the page component handle it if we are already there?
+                // For now, let's assume if not started, we create chat and the redirect handles the rest.
+                // But the user wants to send the message immediately.
+                // Since this component is reused, the parent should handle "onSendMessage" which might include creating a chat if needed.
+                // However, "addChat" seems designed to just create a blank chat and redirect.
+                // Let's rely on props.
+                onStart();
+            }
+            onSendMessage(text);
         }
     };
 
@@ -83,13 +94,11 @@ export default function InputArea({ onStart, started }: InputAreaProps) {
                         {/* Send Button (White Circle) */}
                         <button
                             onClick={() => {
-                                if (input){
+                                if (input) {
                                     onStart();
-                                    if (!started) {
-                                        addChat();
-                                    }
-                                    console.log("Sending:", input);
+                                    const text = input;
                                     setInput("");
+                                    onSendMessage(text);
                                 }
                             }}
                             className="flex h-10 w-10 items-center justify-center rounded-full bg-white text-black transition-transform hover:scale-105 active:scale-95 disabled:opacity-50"
